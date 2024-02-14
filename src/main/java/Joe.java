@@ -3,9 +3,9 @@ import java.util.Scanner;
 public class Joe {
     public static void main(String[] args) {
         int maxTasks = 100;
+        Task[] tasks = new Task[100];
         Scanner scanner = new Scanner(System.in);
         String userInput;
-        Task[] tasks = new Task[100];
         int taskCount = 0;
         String logo = " ╔╦═╦══╦═╦╗\n" +
                       " ║╚╗║╔╗║═╣║\n" +
@@ -16,32 +16,55 @@ public class Joe {
         printWelcome(logo);
         printHelp();
 
-        while (true) {
+        while (true){
             userInput = scanner.nextLine();
-            if (userInput.equalsIgnoreCase("bye")) {
+            if (userInput.equalsIgnoreCase("bye")){
                 break;
             }
-            else if (userInput.equalsIgnoreCase("list")) {
+            else if (userInput.equalsIgnoreCase("list")){
                 printTasks(tasks, taskCount);
                 printHelp();
             }
-            else if (userInput.startsWith("mark ")) {
+            else if (userInput.startsWith("mark ")){
                 markTask(tasks, userInput, taskCount);
                 printHelp();
             }
-            else if (userInput.startsWith("unmark ")) {
+            else if (userInput.startsWith("unmark ")){
                 unmarkTask(tasks, userInput, taskCount);
                 printHelp();
             }
+            else if (userInput.startsWith("todo ")){
+                ToDo userToDo = new ToDo(userInput.replace("todo ", "").trim());
+                tasks[taskCount] = userToDo;
+                taskCount++;
+                System.out.println("Alrightyy, im gonna add " + userInput.replace("todo ", "").trim() + " to your ToDo list!!!");
+                printHelp();
+            }
+            else if (userInput.startsWith("deadline ")){
+                int due = userInput.indexOf("/by");
+                String by = userInput.substring(due + 3).trim();
+                String deadline = userInput.substring(8, due).trim();
+                Deadline userDeadline = new Deadline(deadline, by);
+                tasks[taskCount] = userDeadline;
+                taskCount++;
+                System.out.println("Alrightyy, im gonna add " + deadline + " by " + by +" to your deadlines!!!");
+                printHelp();
+            }
+            else if (userInput.startsWith("event ")) {
+                int splitFrom = userInput.indexOf("/from");
+                int splitTo = userInput.indexOf("/to");
+                String from = userInput.substring(splitFrom + 5, splitTo).trim();
+                String to = userInput.substring(splitTo + 3).trim();
+                String event = userInput.substring(5, splitFrom).trim();
+                Event userEvent = new Event(event, from, to);
+                tasks[taskCount] = userEvent;
+                taskCount++;
+                System.out.println("Alrightyy, im gonna add " + event + " from " + from + " to " + to + " to your events!!!");
+                printHelp();
+            }
             else {
-                if (taskCount >= maxTasks) {
-                    printTasksFull();
-                }
-                else {
-                    tasks[taskCount] = new Task(userInput);
-                    taskCount++;
-                    System.out.println("I just added " + userInput + " to your list!!!!");
-                }
+                System.out.println("Babe come on, what am i gonna do with this???? For the love of God, please give me a valid command.");
+                printHelp();
             }
         }
         printBye();

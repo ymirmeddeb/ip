@@ -1,0 +1,18 @@
+read harry potter
+todo read harry potter
+deadline finish maths homework /by 2nd march
+list
+event project meeting /from friday 2pm /to 3pm
+mark 1
+list
+deadline finish english essay /by tomorrow
+mark 2
+list
+mark 4
+mark 3
+list
+unmark 4
+list
+mark 4
+list
+bye

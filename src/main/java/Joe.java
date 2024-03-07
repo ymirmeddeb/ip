@@ -2,6 +2,7 @@ import java.util.List;
 import java.util.Scanner;
 
 public class Joe {
+
     public static void main(String[] args) {
         int maxTasks = 100;
         Task[] tasks = new Task[maxTasks];

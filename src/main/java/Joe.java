@@ -8,10 +8,10 @@ public class Joe {
         String userInput;
         int taskCount = 0;
         String logo = " ╔╦═╦══╦═╦╗\n" +
-                      " ║╚╗║╔╗║═╣║\n" +
-                      " ║╔╣║╚╝║═╣║\n" +
-                      " ║╚═╩══╩═╝║\n" +
-                      " ╚════════╝\n";
+                " ║╚╗║╔╗║═╣║\n" +
+                " ║╔╣║╚╝║═╣║\n" +
+                " ║╚═╩══╩═╝║\n" +
+                " ╚════════╝\n";
 
         printWelcome(logo);
         printHelp();

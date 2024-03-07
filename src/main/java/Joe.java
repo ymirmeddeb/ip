@@ -1,11 +1,22 @@
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
 public class Joe {
-
     public static void main(String[] args) {
         int maxTasks = 100;
-        Task[] tasks = new Task[maxTasks];
+        Storage storage = new Storage("joe.txt");
+        List<Task> tasks;
+        try {
+            tasks = storage.load();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         Scanner scanner = new Scanner(System.in);
         String userInput;
         int taskCount = 0;
@@ -40,13 +51,23 @@ public class Joe {
             if (userInput.equalsIgnoreCase("bye")) {
                 break;
             } else if (userInput.equalsIgnoreCase("list")) {
-                printTasks(tasks, taskCount);
+                printTasks(tasks);
                 printHelp();
             } else if (userInput.startsWith("mark ")) {
-                markTask(tasks, userInput, taskCount);
+                markTask(tasks, userInput);
+                try {
+                    storage.save(tasks); // Save the updated list
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 printHelp();
             } else if (userInput.startsWith("unmark ")) {
-                unmarkTask(tasks, userInput, taskCount);
+                unmarkTask(tasks, userInput);
+                try {
+                    storage.save(tasks); // Save the updated list
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 printHelp();
             } else if (userInput.startsWith("todo ")) {
                 try {
@@ -54,8 +75,12 @@ public class Joe {
                         throw new JoeException("Listen, you can't tell me to make a todo task for you and then not give me any info on what it is!!! Provide me with some info babes");
                     }
                     ToDo userToDo = new ToDo(userInput.replace("todo ", "").trim());
-                    tasks[taskCount] = userToDo;
-                    taskCount++;
+                    tasks.add(userToDo);
+                    try {
+                        storage.save(tasks); // Save the updated list
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                     System.out.println("Alrightyy, im gonna add " + userInput.replace("todo ", "").trim() + " to your ToDo list!!!");
                     printHelp();
                 } catch (JoeException e) {
@@ -74,8 +99,12 @@ public class Joe {
                     }
                     String deadline = userInput.substring(8, due).trim();
                     Deadline userDeadline = new Deadline(deadline, by);
-                    tasks[taskCount] = userDeadline;
-                    taskCount++;
+                    tasks.add(userDeadline);
+                    try {
+                        storage.save(tasks); // Save the updated list
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                     System.out.println("Alrightyy, im gonna add " + deadline + " by " + by + " to your deadlines!!!");
                     printHelp();
                 } catch (JoeException e) {
@@ -96,8 +125,12 @@ public class Joe {
                     String from = userInput.substring(splitFrom + 5, splitTo).trim();
                     String event = userInput.substring(5, splitFrom).trim();
                     Event userEvent = new Event(event, from, to);
-                    tasks[taskCount] = userEvent;
-                    taskCount++;
+                    tasks.add(userEvent);
+                    try {
+                        storage.save(tasks); // Save the updated list
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                     System.out.println("Alrightyy, im gonna add " + event + " from " + from + " to " + to + " to your events!!!");
                     printHelp();
                 } catch (JoeException e) {
@@ -106,21 +139,25 @@ public class Joe {
                 }
             }
             else if (userInput.startsWith("delete ")) {
-                int taskNumber = 0;
                 try {
-                    taskNumber = Integer.parseInt(userInput.substring(7));
-                    if (taskNumber <= 0 || taskNumber > taskCount) {
-                        throw new JoeException("Invalid task number!");
+                    int taskNumber = Integer.parseInt(userInput.substring(7).trim());
+                    if (taskNumber <= 0 || taskNumber > tasks.size()) {
+                        System.err.println("Invalid task number!");
+                        printHelp();
+                    } else {
+                        Task taskToDelete = tasks.remove(taskNumber - 1);
+                        try {
+                            storage.save(tasks);
+                            System.out.println("Sure thing, I've removed: ");
+                            System.out.println("  " + taskToDelete);
+                            System.out.println("from the list.");
+                        } catch (IOException e) {
+                            System.err.println("Error saving tasks: " + e.getMessage());
+                            tasks.add(taskNumber - 1, taskToDelete);
+                        }
                     }
-                    Task taskToDelete = Task.getTask(tasks, taskNumber - 1);
-                    Task.removeTask(tasks, taskNumber - 1);
-                    taskCount--;
-                    System.out.println("Sure thing baby gurl, I've removed ");
-                    System.out.println("  " + taskToDelete);
-                    System.out.println("from the list (:");
-                } catch (JoeException e) {
-                    System.err.println("Error: " + e.getMessage());
-                    printHelp();
+                } catch (NumberFormatException e) {
+                    System.err.println("Error: The task number is invalid. Please enter a valid number.");
                 }
             }
             else if (userInput.equalsIgnoreCase("bye")) {
@@ -142,29 +179,34 @@ public class Joe {
     public static void printBye(){
         System.out.println("Love ya <3 See ya!!");
     }
-    public static void printTasks(Task[] tasks, int nextTask){
-        if (tasks[0] == null){
+    public static void printTasks(List<Task> tasks) {
+        if (tasks.isEmpty()) {
             System.out.println("Your list is empty ;_;");
             return;
         }
-        for (int i = 0; i < nextTask; i++) {
-            System.out.println(i+1 + ".     " + tasks[i] + "\n");
+        int index = 1;
+        for (Task task : tasks) {
+            System.out.println(index + ". " + task);
+            index++;
         }
     }
 
-    public static void markTask(Task[] tasks, String userInput, int taskCount){
+    public static void markTask(List<Task> tasks, String userInput) {
         int index = Integer.parseInt(userInput.substring(5)) - 1;
-        if (index >= 0 && index < taskCount) {
-            tasks[index].markAsDone();
-            System.out.println("Okayyy i marked it!\n" + tasks[index]);
+        if (index >= 0 && index < tasks.size()) {
+            Task task = tasks.get(index);
+            task.markAsDone();
+            System.out.println("Okayyy I marked it!\n" + task);
         }
+
     }
 
-    public static void unmarkTask(Task[] tasks, String userInput, int taskCount){
+    public static void unmarkTask(List<Task> tasks, String userInput) {
         int index = Integer.parseInt(userInput.substring(7)) - 1;
-        if (index >= 0 && index < taskCount) {
-            tasks[index].markAsNotDone();
-            System.out.println("Okayyy i unmarked it!\n" + tasks[index]);
+        if (index >= 0 && index < tasks.size()) {
+            Task task = tasks.get(index);
+            task.markAsNotDone();
+            System.out.println("Okayyy I unmarked it!\n" + task);
         }
     }
 }

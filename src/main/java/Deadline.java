@@ -7,7 +7,7 @@ public class Deadline extends Task{
     }
 
     public String getBy() {
-        return this.by;
+        return by;
     }
 
     public void setBy(String newBy) {

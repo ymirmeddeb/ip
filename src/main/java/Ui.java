@@ -3,10 +3,10 @@ import java.util.List;
 public class Ui {
     public void printWelcome() {
         String logo = " ╔╦═╦══╦═╦╗\n" +
-                " ║╚╗║╔╗║═╣║\n" +
-                " ║╔╣║╚╝║═╣║\n" +
-                " ║╚═╩══╩═╝║\n" +
-                " ╚════════╝\n";
+                      " ║╚╗║╔╗║═╣║\n" +
+                      " ║╔╣║╚╝║═╣║\n" +
+                      " ║╚═╩══╩═╝║\n" +
+                      " ╚════════╝\n";
         System.out.println("Hiiii, my name is\n" + logo);
         System.out.println("I am here to help :3");
     }
@@ -38,13 +38,13 @@ public class Ui {
     public void printTaskAdded(Task task, List<Task> tasks) {
         System.out.println("Alrightyyy, I've added this task:");
         System.out.println("  " + task);
-        System.out.println("Now you have " + tasks.size() + " tasks in the list <3");
+        System.out.println("Now you have " + tasks.size() + " tasks in the list pookie dookie bear <3");
     }
 
     public void printTaskRemoved(Task task, List<Task> tasks) {
         System.out.println("Okayyyy, I've removed this task:");
         System.out.println("  " + task);
-        System.out.println("Now you have " + tasks.size() + " tasks in the list <3");
+        System.out.println("Now you have " + tasks.size() + " tasks in the list pookie bear <3");
     }
 
     public void printMarkedTask(Task task, boolean isDone) {
@@ -54,6 +54,17 @@ public class Ui {
             System.out.println("Sure thinggg! I've marked this task as not done yet just for you:");
         }
         System.out.println("  " + task);
+    }
+
+    public void printFoundTasks(List<Task> tasks) {
+        if (tasks.isEmpty()) {
+            System.out.println("Sorry sweetie, I couln't find any tasks with your keyword :(");
+        } else {
+            System.out.println("Ok cutie patootie, here are the matching tasks in your list:");
+            for (int i = 0; i < tasks.size(); i++) {
+                System.out.println((i + 1) + "." + tasks.get(i));
+            }
+        }
     }
 }
 

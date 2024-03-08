@@ -1,5 +1,6 @@
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class Joe {
@@ -57,6 +58,11 @@ public class Joe {
                     deleteTask(userInput);
                     ui.printHelp();
                     break;
+                case "find":
+                    String keyword = parser.getTaskDescription(userInput);
+                    List<Task> foundTasks = taskList.findTasksByKeyword(keyword);
+                    ui.printFoundTasks(foundTasks);
+                    break;
                 default:
                     ui.printError("Babe come on, what am i gonna do with this???? For the love of God, please give me a valid command.");
             }
@@ -70,7 +76,7 @@ public class Joe {
         try {
             Task task = parser.parseTask(userInput, type);
             taskList.addTask(task);
-            storage.save(taskList.getTasks()); // Save tasks to storage
+            storage.save(taskList.getTasks());
             ui.printTaskAdded(task, taskList.getTasks());
         } catch (IOException e) {
             ui.printError("I have failed you :( I have failed to save the tasks: " + e.getMessage());
@@ -81,7 +87,7 @@ public class Joe {
 
     private void markTask(String userInput) {
         try {
-            int index = parser.parseTaskIndex(userInput); // This method needs to be implemented in Parser
+            int index = parser.parseTaskIndex(userInput);
             taskList.markTaskAsDone(index);
             storage.save(taskList.getTasks());
             ui.printMarkedTask(taskList.getTask(index), true);
@@ -96,7 +102,7 @@ public class Joe {
 
     private void unmarkTask(String userInput) {
         try {
-            int index = parser.parseTaskIndex(userInput); // Implement this in Parser
+            int index = parser.parseTaskIndex(userInput);
             taskList.markTaskAsNotDone(index);
             storage.save(taskList.getTasks());
             ui.printMarkedTask(taskList.getTask(index), false);
@@ -111,7 +117,7 @@ public class Joe {
 
     private void deleteTask(String userInput) {
         try {
-            int index = parser.parseTaskIndex(userInput); // Implement this in Parser
+            int index = parser.parseTaskIndex(userInput);
             Task task = taskList.removeTask(index);
             storage.save(taskList.getTasks());
             ui.printTaskRemoved(task, taskList.getTasks());

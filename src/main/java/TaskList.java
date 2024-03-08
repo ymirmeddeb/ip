@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class TaskList {
     private List<Task> tasks;
@@ -30,5 +31,11 @@ public class TaskList {
 
     public void markTaskAsNotDone(int index) {
         tasks.get(index).markAsNotDone();
+    }
+
+    public List<Task> findTasksByKeyword(String keyword) {
+        return tasks.stream()
+                .filter(task -> task.getDescription().toLowerCase().contains(keyword.toLowerCase()))
+                .collect(Collectors.toList());
     }
 }

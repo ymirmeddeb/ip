@@ -16,10 +16,9 @@ public class Storage {
     public List<Task> load() throws IOException {
         List<Task> loadedTasks = new ArrayList<>();
         File file = new File(filePath);
-        System.out.println(file.getAbsolutePath());
         if (!file.exists()) {
-            file.getParentFile().mkdirs(); // Create the directory structure if it doesn't exist
-            file.createNewFile(); // Create the file if it doesn't exist
+            file.getParentFile().mkdirs();
+            file.createNewFile();
         }
         List<String> lines = Files.readAllLines(Paths.get(filePath));
         for (String line : lines) {
@@ -68,3 +67,4 @@ public class Storage {
         writer.close();
     }
 }
+

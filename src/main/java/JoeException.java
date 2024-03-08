@@ -1,5 +1,5 @@
 public class JoeException extends Exception {
-        public JoeException(String message) {
-            super(message);
-        }
+    public JoeException(String message) {
+        super(message);
     }
+}

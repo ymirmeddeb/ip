@@ -3,23 +3,63 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.nio.file.Path;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Storage {
     private String filePath;
+    private Path path;
 
     public Storage(String filePath) {
+        if (filePath == null || filePath.trim().isEmpty()) {
+            throw new IllegalArgumentException("File path cannot be null or empty.");
+        }
         this.filePath = filePath;
     }
 
-    public List<Task> load() throws IOException {
-        List<Task> loadedTasks = new ArrayList<>();
-        File file = new File(filePath);
-        if (!file.exists()) {
-            file.getParentFile().mkdirs();
-            file.createNewFile();
+    private void ensureFileExists() {
+        try {
+            File file = path.toFile();
+            System.out.println("Attempting to use file path: " + filePath);
+            // Ensure directories exist or create them
+            boolean dirsCreated = file.getParentFile().mkdirs();
+            if (!dirsCreated && !file.getParentFile().exists()) {
+                throw new IOException("Failed to create parent directories for " + filePath);
+            }
+            // Now it's safe to attempt creating the file
+            boolean fileCreated = file.createNewFile();
+            if (!fileCreated) {
+                throw new IOException("Failed to create the file " + filePath);
+            }
+        } catch (IOException e) {
+            System.err.println("An error occurred while ensuring the data file exists: " + e.getMessage());
         }
+        System.out.println("Attempting to use file path: " + filePath);
+    }
+
+
+    public List<Task> load() throws IOException {
+        File file = new File(filePath);
+
+        if (file.getParentFile() != null && !file.getParentFile().exists()) {
+            boolean dirsCreated = file.getParentFile().mkdirs();
+            if (!dirsCreated) {
+                System.err.println("Warning: Failed to create parent directories for " + filePath);
+            }
+        }
+        if (!file.exists()) {
+            boolean fileCreated = file.createNewFile();
+            if (!fileCreated) {
+                System.err.println("Warning: Failed to create the file " + filePath);
+            }
+            // Since the file is just created, it's empty. Return an empty list.
+            return new ArrayList<>();
+        }
+        List<Task> loadedTasks = new ArrayList<>();
+        // Read all lines from the file
         List<String> lines = Files.readAllLines(Paths.get(filePath));
         for (String line : lines) {
             String[] parts = line.split(" \\| ");
@@ -29,7 +69,9 @@ public class Storage {
                     task = new ToDo(parts[2]);
                     break;
                 case "D":
-                    task = new Deadline(parts[2], parts[3]);
+                    String desc = parts[2];
+                    LocalDateTime by = LocalDateTime.parse(parts[3]); // Parse the datetime part directly to LocalDateTime
+                    task = new Deadline(desc, by); // Pass the LocalDateTime object directly
                     break;
                 case "E":
                     task = new Event(parts[2], parts[3], parts[4]);
@@ -67,6 +109,4 @@ public class Storage {
         writer.close();
     }
 }
-
-
 

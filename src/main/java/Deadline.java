@@ -1,12 +1,13 @@
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 
 public class Deadline extends Task {
     protected LocalDateTime by;
 
-    public Deadline(String desc, String by) {
+    public Deadline(String desc, LocalDateTime by) {
         super(desc);
-        this.by = LocalDateTime.parse(by);
+        this.by = by;
     }
 
     public LocalDateTime getBy() {
